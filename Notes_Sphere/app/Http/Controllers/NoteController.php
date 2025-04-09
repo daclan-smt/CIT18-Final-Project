@@ -15,10 +15,12 @@ class NoteController extends Controller
 
     public function store(Request $request, Notebook $notebook)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $notebook->notes()->create($request->only('title', 'content'));
-
-        return redirect()->route('notebooks.show', $notebook);
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+        $note = $notebook->notes()->create($validated);
+        return redirect()->route('notebooks.show', $notebook)->with('success', 'Note created successfully.');
     }
 
     public function edit(Notebook $notebook, Note $note)
@@ -30,13 +32,12 @@ class NoteController extends Controller
     {
         $request->validate(['title' => 'required', 'content' => 'required']);
         $note->update($request->only('title', 'content'));
-
-        return redirect()->route('notebooks.show', $notebook);
+        return redirect()->route('notebooks.show', $notebook)->with('success', 'Note updated successfully.');
     }
 
     public function destroy(Notebook $notebook, Note $note)
     {
         $note->delete();
-        return redirect()->route('notebooks.show', $notebook);
+        return redirect()->route('notebooks.show', $notebook)->with('success', 'Note deleted successfully.');
     }
 }

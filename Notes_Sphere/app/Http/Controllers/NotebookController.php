@@ -9,49 +9,57 @@ class NotebookController extends Controller
 {
     public function index()
     {
+        // Display all notebooks
         $notebooks = Notebook::all();
         return view('notebooks.index', compact('notebooks'));
     }
 
     public function create()
     {
-        $notebooks = Notebook::all(); // or maybe just the user's notebooks
-        return view('notebooks.create', compact('notebooks'));
+        return view('notebooks.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate(['title' => 'required']);
-        Notebook::create($request->only('title'));
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
 
-        return redirect()->route('notebooks.index')->with('success', 'Notebook created successfully!');
+        Notebook::create([
+            'title' => $request->title,
+        ]);
+
+        return redirect()->route('notebooks.index')->with('success', 'Notebook created successfully.');
     }
 
     public function show(Notebook $notebook)
     {
-        $notebooks = Notebook::all(); // for sidebar
-        $notebook->load('notes');
-
-        return view('notebooks.show', compact('notebook', 'notebooks'));
+        // Show notes within a notebook
+        $notes = $notebook->notes;
+        return view('notebooks.show', compact('notebook', 'notes'));
     }
 
     public function edit(Notebook $notebook)
     {
-        $notebooks = Notebook::all(); 
-        return view('notebooks.edit', compact('notebook', 'notebooks'));
+        return view('notebooks.edit', compact('notebook'));
     }
 
     public function update(Request $request, Notebook $notebook)
     {
-        $request->validate(['title' => 'required']);
-        $notebook->update($request->only('title'));
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
 
-        return redirect()->route('notebooks.index');
+        $notebook->update([
+            'title' => $request->title,
+        ]);
+
+        return redirect()->route('notebooks.index')->with('success', 'Notebook updated successfully.');
     }
 
     public function destroy(Notebook $notebook)
     {
         $notebook->delete();
-        return redirect()->route('notebooks.index');
+        return redirect()->route('notebooks.index')->with('success', 'Notebook deleted successfully.');
     }
 }

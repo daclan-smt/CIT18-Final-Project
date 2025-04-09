@@ -9,4 +9,4 @@ Route::get('/', function () {
 });
 
 Route::resource('notebooks', NotebookController::class);
-Route::resource('notebooks.notes', NoteController::class);
+Route::resource('notebooks.notes', NoteController::class); // Nested routes for notes inside notebooks
